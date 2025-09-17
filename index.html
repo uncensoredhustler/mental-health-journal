@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Health Journal | MindSpace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <h1 class="logo">🧠 MindSpace</h1>
+    <nav id="nav">
+      <button data-view="dashboard" class="nav-btn active">Dashboard</button>
+      <button data-view="log" class="nav-btn">Log Mood</button>
+      <button data-view="history" class="nav-btn">History</button>
+      <button data-view="analytics" class="nav-btn">Analytics</button>
+      <button data-view="resources" class="nav-btn">Resources</button>
+      <button data-view="profile" class="nav-btn">Profile</button>
+      <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+    <button id="hamburger" class="hamburger">☰</button>
+  </header>
+
+  <!-- Main App -->
+  <main id="app">
+    <!-- Content loads here -->
+  </main>
+
+  <!-- Templates -->
+  <template id="dashboardTpl">
+    <section class="view">
+      <h2>Hi <span id="usernameDash">User</span>!</h2>
+      <div class="card">
+        <h3>Mood Trend (Last 7 Days)</h3>
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+      <div class="quick-actions">
+        <button data-view="log" class="primary">✏️ Log New Mood</button>
+        <button data-view="analytics" class="primary">📈 See Analytics</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="logTpl">
+    <section class="view">
+      <h2>Log Your Mood</h2>
+      <div class="card">
+        <form id="logForm">
+          <label>
+            Mood *
+            <select id="moodSel" required>
+              <option value="">Select your mood...</option>
+            </select>
+          </label>
+
+          <label>
+            Intensity: <span id="intensityVal">5</span>/10
+            <input type="range" min="1" max="10" value="5" id="intensity">
+          </label>
+
+          <label>
+            Trigger (Optional)
+            <select id="triggerSel">
+              <option value="">What triggered this mood?</option>
+            </select>
+          </label>
+
+          <label>
+            Coping Strategy (Optional)
+            <select id="strategySel">
+              <option value="">How are you coping?</option>
+            </select>
+          </label>
+
+          <label>
+            Notes (Optional)
+            <textarea id="notes" rows="4" placeholder="Describe how you're feeling..."></textarea>
+          </label>
+
+          <button class="primary" type="submit">💾 Save Entry</button>
+        </form>
+      </div>
+    </section>
+  </template>
+
+  <template id="historyTpl">
+    <section class="view">
+      <h2>Mood History</h2>
+      <div class="card filters">
+        <h3>Filter Entries</h3>
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label>From Date</label>
+            <input type="date" id="startDate">
+          </div>
+          <div class="filter-group">
+            <label>To Date</label>
+            <input type="date" id="endDate">
+          </div>
+          <div class="filter-group">
+            <label>Mood Type</label>
+            <select id="moodFilter">
+              <option value="">All Moods</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button id="applyFilter" class="primary">Apply Filter</button>
+            <button id="clearFilter" class="secondary">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div id="historyList"></div>
+    </section>
+  </template>
+
+  <template id="analyticsTpl">
+    <section class="view">
+      <h2>Analytics Dashboard</h2>
+      <div class="analytics-grid">
+        <div class="card stats-card">
+          <h3>📊 Quick Stats</h3>
+          <div class="stat-item">
+            <span>Total Entries:</span>
+            <span class="stat-value" id="totalEntries">0</span>
+          </div>
+          <div class="stat-item">
+            <span>Average Mood:</span>
+            <span class="stat-value" id="avgMood">0</span>
+          </div>
+          <div class="stat-item">
+            <span>Best Day:</span>
+            <span class="stat-value" id="bestDay">None</span>
+          </div>
+          <div class="stat-item">
+            <span>Current Streak:</span>
+            <span class="stat-value">3 days</span>
+          </div>
+        </div>
+        
+        <div class="card chart-card">
+          <h3>🥧 Mood Distribution</h3>
+          <div class="chart-container">
+            <canvas id="moodPieChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="card chart-card">
+          <h3>📈 Trigger Analysis</h3>
+          <div class="chart-container">
+            <canvas id="triggerBarChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>📅 Weekly Overview</h3>
+          <div id="weeklyOverview">
+            <p>Your mood patterns show improvement this week! 🎉</p>
+            <p>Most common trigger: <strong>Work Stress</strong></p>
+            <p>Most effective strategy: <strong>Deep Breathing</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="resourcesTpl">
+    <section class="view">
+      <h2>Mental Health Resources</h2>
+      <div class="resources-grid">
+        <div class="card emergency-card">
+          <h3>🚨 Emergency Support</h3>
+          <div class="contact-list">
+            <div class="contact-item">
+              <strong>National Suicide Prevention Lifeline</strong>
+              <p><a href="tel:988">📞 Call 988</a></p>
+              <small>24/7 crisis support</small>
+            </div>
+            <div class="contact-item">
+              <strong>Crisis Text Line</strong>
+              <p>Text <strong>HOME</strong> to <strong>741741</strong></p>
+              <small>Free 24/7 support via text</small>
+            </div>
+            <div class="contact-item">
+              <strong>SAMHSA National Helpline</strong>
+              <p><a href="tel:1-800-662-4357">📞 1-800-662-4357</a></p>
+              <small>Treatment referral service</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>🧘 Breathing Exercise</h3>
+          <div class="breathing-exercise">
+            <div class="breathing-circle" id="breathingCircle"></div>
+            <p id="breathingText">Click to start breathing exercise</p>
+            <button id="startBreathing" class="primary">Start Exercise</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>💡 Daily Inspiration</h3>
+          <div id="dailyTip" class="tip-container">
+            <p>"Remember: You are stronger than you think, and you have survived 100% of your difficult days so far."</p>
+          </div>
+          <button id="newTip" class="secondary">Get New Tip</button>
+        </div>
+
+        <div class="card">
+          <h3>📚 Helpful Resources</h3>
+          <ul class="article-list">
+            <li><a href="https://www.nami.org/anxiety-disorders" target="_blank">🔗 Understanding Anxiety</a></li>
+            <li><a href="https://www.sleepfoundation.org" target="_blank">🔗 Better Sleep Habits</a></li>
+            <li><a href="https://www.mindful.org" target="_blank">🔗 Mindfulness Techniques</a></li>
+            <li><a href="https://www.mentalhealth.gov" target="_blank">🔗 Mental Health Information</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="profileTpl">
+    <section class="view">
+      <h2>Profile & Settings</h2>
+      <div class="profile-grid">
+        <div class="card">
+          <h3>👤 Personal Information</h3>
+          <form id="profileForm">
+            <label>
+              Name
+              <input type="text" id="profileName" value="User">
+            </label>
+            <label>
+              Email
+              <input type="email" id="profileEmail" value="user@example.com">
+            </label>
+            <label>
+              Timezone
+              <select id="profileTimezone">
+                <option value="UTC">UTC</option>
+                <option value="EST">Eastern Time</option>
+                <option value="PST">Pacific Time</option>
+                <option value="IST">Indian Standard Time</option>
+              </select>
+            </label>
+            <button type="submit" class="primary">💾 Update Profile</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>💾 Data Management</h3>
+          <div class="data-actions">
+            <button id="exportData" class="primary">📤 Export My Data</button>
+            <button id="importData" class="secondary">📥 Import Data</button>
+            <input type="file" id="importFile" accept=".json" hidden>
+            <button id="clearData" class="danger">🗑️ Clear All Data</button>
+          </div>
+          <small>Export your mood data as JSON for backup or analysis</small>
+        </div>
+
+        <div class="card">
+          <h3>🔔 Preferences</h3>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="dailyReminders" checked>
+              Daily mood tracking reminders
+            </label>
+          </div>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="weeklyReports" checked>
+              Weekly progress reports
+            </label>
+          </div>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="darkMode">
+              Prefer dark mode
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📈 Your Statistics</h3>
+          <div class="stat-item">
+            <span>Days using app:</span>
+            <span class="stat-value" id="daysUsing">0</span>
+          </div>
+          <div class="stat-item">
+            <span>Current streak:</span>
+            <span class="stat-value">3 days</span>
+          </div>
+          <div class="stat-item">
+            <span>Most logged mood:</span>
+            <span class="stat-value">😊 Happy</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
